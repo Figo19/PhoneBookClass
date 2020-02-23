@@ -103,17 +103,16 @@ class BookBase:
         
     def find(self, **kwargs):
         """Find all the entries to match the given (keyword) arguments. Returns a list of matches (or an empty list if no matches were found)"""
-        matches = []
+        return [entry for entry in self.entries if all(kwargs[attr] == entry[attr] for attr in kwargs)]  # Same as list(filter(...))
+        
+        
+        ''' # Use this if we want to return only the first match
         for entry in self.entries:
-            found = True
             for (kw, value) in kwargs.items():
                 if entry[kw] != value:  # if kw in self.attributes and entry[kw] != kwargs[kw]:  -> use this if we want to ignore kwords that don't exist
-                    found = False
-                    break
-                    
-            if found:
-                matches.append(entry)
-        return matches
+                    continue
+                return entry
+        '''
     
             
     def create_copy(self):
@@ -140,10 +139,8 @@ class BookBase:
     
     def __str__(self):
         if self.entries:
-            s = ''
             ix_length = len(str(len(self.entries)))  # for better float/string formatting and divider size
-            for ix, entry in enumerate(self.entries, start=1):
-                s += f'--- Entry #{ix:0{ix_length}} ---\n{entry}\n\n'
+            s = '\n'.join(f'--- Entry #{ix:0{ix_length}} ---\n{entry}\n' for ix, entry in enumerate(self.entries, start=1))
             s += '-' * (15 + ix_length)
         else:
             s = "Your book has no entries yet"
